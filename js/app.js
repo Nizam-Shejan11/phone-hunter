@@ -28,7 +28,7 @@ const displayPhones = (phones, dataLimit) => {
 
   // display all phones
   phones.forEach((phone) => {
-    console.log(phone);
+    // console.log(phone);
     const phoneDiv = document.createElement("div");
     phoneDiv.innerHTML = `
     <div class="card p-4">
@@ -40,6 +40,10 @@ const displayPhones = (phones, dataLimit) => {
                lead-in to additional content. This content is a little bit
                longer.
             </p>
+            <button onclick="loadPhoneDetails('${phone.slug}')" href="#"    class="btn btn-primary" 
+            data-bs-toggle="modal"
+            data-bs-target="#phoneDetailModal">Show Details
+            </button>
         </div>
     </div>
     `;
@@ -62,6 +66,15 @@ document.getElementById("btn-search").addEventListener("click", function () {
   processSearch(10);
 });
 
+// search input field click enter
+document
+  .getElementById("search-field")
+  .addEventListener("keypress", function (e) {
+    if (e.key === "Enter") {
+      processSearch(10);
+    }
+  });
+
 const toggleSpinner = (isLoading) => {
   const loderSection = document.getElementById("loader");
   if (isLoading) {
@@ -76,4 +89,27 @@ document.getElementById("btn-show-all").addEventListener("click", function () {
   processSearch();
 });
 
-// loadPhones("phone");
+const loadPhoneDetails = async (id) => {
+  const url = `https://openapi.programming-hero.com/api/phone/${id}`;
+  const res = await fetch(url);
+  const data = await res.json();
+  displayPhoneDetails(data.data);
+};
+
+const displayPhoneDetails = (phone) => {
+  console.log(phone);
+  const modalTitle = document.getElementById("phoneDetailModalLabel");
+  modalTitle.innerText = phone.name;
+
+  const phoneDetails = document.getElementById("phone-details");
+  phoneDetails.innerHTML = `
+      <img src=${phone?.image} alt="#">
+      <h5> Brand: ${phone?.brand} </h5>
+      <p> Release Date: ${
+        phone?.releaseDate ? phone?.releaseDate : "No Release Date found"
+      } </p>
+      <p> Memory: ${phone?.mainFeatures.memory} </p>
+  `;
+};
+
+loadPhones("apple");
